@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vereins-Getränkerechner</title>
+  <link rel="stylesheet" href="./CSS/style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <header>
+      <h1>🍺 Getränkerechner</h1>
+      <p>Abrechnung & Verbrauch</p>
+    </header>
+
+    <!-- Phase 1: Einkauf & Getränke-Setup -->
+    <section class="card">
+      <h2>1. Getränke & Einkauf erfassen</h2>
+      <p class="card-subtitle">Trage hier alle eingekauften Getränke, deren Verkaufspreis und den Anfangsbestand ein.</p>
+      
+      <div class="table-wrapper">
+        <table id="setup-table">
+          <thead>
+            <tr>
+              <th>Getränk / Name</th>
+              <th>Preis (€ / Stk.)</th>
+              <th>Anfangsbestand (Stk.)</th>
+              <th>Aktion</th>
+            </tr>
+          </thead>
+          <tbody id="drinks-setup-body">
+            <!-- Dynamische Zeilen werden per JS eingefügt -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="setup-actions">
+        <button id="add-drink-btn" class="btn secondary-btn">+ Weitere Sorte hinzufügen</button>
+      </div>
+    </section>
+
+    <!-- Phase 2: Restbestand & Abrechnung -->
+    <section class="card">
+      <h2>2. Restbestand nach dem Fest</h2>
+      <p class="card-subtitle">Trage nach der Veranstaltung ein, wie viele Flaschen/Dosen noch übrig sind.</p>
+      
+      <div class="table-wrapper">
+        <table id="calc-table">
+          <thead>
+            <tr>
+              <th>Getränk</th>
+              <th>Preis</th>
+              <th>Anfang</th>
+              <th>Endbestand (Rest)</th>
+              <th>Verbraucht</th>
+              <th>Umsatz (€)</th>
+            </tr>
+          </thead>
+          <tbody id="drinks-calc-body">
+            <!-- Dynamische Zeilen für die Abrechnung -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="calc-actions">
+        <button id="calculate-btn" class="btn primary-btn">🧮 Abrechnung berechnen</button>
+        <button id="reset-btn" class="btn danger-btn">Zurücksetzen</button>
+      </div>
+    </section>
+
+    <!-- Zusammenfassung / Kassensturz -->
+    <section id="summary-card" class="card summary-card hidden">
+      <h2>📊 Kassensturz & Zusammenfassung</h2>
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">Eingekaufte Getränke gesamt</span>
+          <span id="stat-initial-items" class="summary-value">0 Stk.</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Getrunkene Getränke gesamt</span>
+          <span id="stat-consumed-items" class="summary-value highlight-consumed">0 Stk.</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Warenwert / Potential</span>
+          <span id="stat-total-val" class="summary-value">0,00 €</span>
+        </div>
+        <div class="summary-item main-result">
+          <span class="summary-label">Gesamteinnahmen (Soll-Kasse)</span>
+          <span id="stat-total-revenue" class="summary-value highlight-revenue">0,00 €</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
