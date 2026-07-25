@@ -149,3 +149,5 @@ document.addEventListener("DOMContentLoaded", () => {
   // Anwendung starten
   init();
 });
+
+// Das ist ein Kommentar für GitHub
