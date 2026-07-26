@@ -42,7 +42,7 @@
 
     <!-- Phase 2: Restbestand & Abrechnung -->
     <section class="card">
-      <h2>2. Restbestand nach dem Fest</h2>
+      <h2>2. Endstand</h2>
       <p class="card-subtitle">Trage nach der Veranstaltung ein, wie viele Flaschen/Dosen noch übrig sind.</p>
       
       <div class="table-wrapper">
@@ -50,11 +50,8 @@
           <thead>
             <tr>
               <th>Getränk</th>
-              <th>Preis</th>
-              <th>Anfang</th>
-              <th>Endbestand (Rest)</th>
               <th>Verbraucht</th>
-              <th>Umsatz (€)</th>
+              <th>Endbestand (Rest)</th>
             </tr>
           </thead>
           <tbody id="drinks-calc-body">
@@ -64,14 +61,14 @@
       </div>
 
       <div class="calc-actions">
-        <button id="calculate-btn" class="btn primary-btn">🧮 Abrechnung berechnen</button>
+        <button id="calculate-btn" class="btn primary-btn">🧮 Abrechnung</button>
         <button id="reset-btn" class="btn danger-btn">Zurücksetzen</button>
       </div>
     </section>
 
     <!-- Zusammenfassung / Kassensturz -->
     <section id="summary-card" class="card summary-card hidden">
-      <h2>📊 Kassensturz & Zusammenfassung</h2>
+      <h2>📊 Abrechnung</h2>
       <div class="summary-grid">
         <div class="summary-item">
           <span class="summary-label">Eingekaufte Getränke gesamt</span>
