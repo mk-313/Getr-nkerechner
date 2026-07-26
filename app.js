@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const resetBtn = document.getElementById("reset-btn");
   const summaryCard = document.getElementById("summary-card");
 
-  // Initialisierung: Eine leere Startzeile einfügen
+  // Initialisierung: Eine leere Startzeile bereitstellen
   function init() {
     drinksSetupBody.innerHTML = "";
     addDrinkRow();
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <td data-label="Aktion"><button class="icon-btn remove-row-btn" title="Entfernen">✕</button></td>
     `;
 
-    // Live-Synchronisation bei jeder Eingabe
+    // Live-Updates bei jeder Eingabe
     tr.querySelectorAll("input").forEach(input => {
       input.addEventListener("input", syncCalcTable);
     });
@@ -40,12 +40,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   addDrinkBtn.addEventListener("click", () => addDrinkRow());
 
-  // Untere Tabelle (Endstand) synchronisieren
+  // Untere Tabelle (Endstand) mit allen Werten aus Bereich 1 synchronisieren
   function syncCalcTable() {
     const setupRows = drinksSetupBody.querySelectorAll("tr");
     const currentCalcValues = {};
 
-    // Eingegebene Restbestände merken, damit sie bei Textänderungen oben erhalten bleiben
+    // Eingegebene Restbestände im Speicher halten
     drinksCalcBody.querySelectorAll("tr").forEach((tr, idx) => {
       const restInput = tr.querySelector(".drink-rest");
       if (restInput) {
@@ -57,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setupRows.forEach((row, idx) => {
       const name = row.querySelector(".drink-name").value || `Getränk ${idx + 1}`;
+      const price = parseFloat(row.querySelector(".drink-price").value) || 0;
       const initial = parseInt(row.querySelector(".drink-initial").value) || 0;
       const savedRest = currentCalcValues[idx] !== undefined ? currentCalcValues[idx] : "";
 
@@ -65,23 +66,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
       tr.innerHTML = `
         <td data-label="Getränk"><strong>${escapeHtml(name)}</strong></td>
-        <td data-label="Verbraucht" class="consumed-val">-</td>
+        <td data-label="Preis">${price.toFixed(2)} €</td>
+        <td data-label="Anfang">${initial} Stk.</td>
         <td data-label="Endbestand (Rest)"><input type="number" class="drink-rest" min="0" max="${initial}" placeholder="0" value="${savedRest}"></td>
+        <td data-label="Verbraucht" class="consumed-val">-</td>
+        <td data-label="Wert (€)" class="revenue-val">-</td>
       `;
 
       drinksCalcBody.appendChild(tr);
     });
   }
 
-  // Abrechnung durchführen
+  // Abrechnung berechnen
   calculateBtn.addEventListener("click", () => {
     const setupRows = drinksSetupBody.querySelectorAll("tr");
     const calcRows = drinksCalcBody.querySelectorAll("tr");
 
-    let totalInitialItems = 0;
-    let totalConsumedItems = 0;
-    let totalPotentialVal = 0;
-    let totalRevenue = 0;
+    let totalPotentialVal = 0; // Gesamtwert (Einkauf)
+    let totalConsumedVal = 0;  // Verbrauch (€)
+    let totalRemainingVal = 0; // Endstand (€ / Restwert)
 
     let hasError = false;
 
@@ -102,25 +105,26 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const consumed = initial - rest;
-      const revenue = consumed * price;
+      const consumedValue = consumed * price;
+      const remainingValue = rest * price;
+      const initialValue = initial * price;
 
-      // Tabellenzelle in der 2. Tabelle aktualisieren
+      // Tabellenzellen in der 2. Tabelle aktualisieren
       calcRow.querySelector(".consumed-val").textContent = `${consumed} Stk.`;
+      calcRow.querySelector(".revenue-val").textContent = `${consumedValue.toFixed(2)} €`;
 
       // Gesamtsummen berechnen
-      totalInitialItems += initial;
-      totalConsumedItems += consumed;
-      totalPotentialVal += initial * price;
-      totalRevenue += revenue;
+      totalPotentialVal += initialValue;
+      totalConsumedVal += consumedValue;
+      totalRemainingVal += remainingValue;
     });
 
     if (hasError) return;
 
     // Kassensturz/Zusammenfassung befüllen und anzeigen
-    document.getElementById("stat-initial-items").textContent = `${totalInitialItems} Stk.`;
-    document.getElementById("stat-consumed-items").textContent = `${totalConsumedItems} Stk.`;
     document.getElementById("stat-total-val").textContent = `${totalPotentialVal.toFixed(2)} €`;
-    document.getElementById("stat-total-revenue").textContent = `${totalRevenue.toFixed(2)} €`;
+    document.getElementById("stat-remaining-val").textContent = `${totalRemainingVal.toFixed(2)} €`;
+    document.getElementById("stat-consumed-val").textContent = `${totalConsumedVal.toFixed(2)} €`;
 
     summaryCard.classList.remove("hidden");
     summaryCard.scrollIntoView({ behavior: "smooth" });

@@ -50,8 +50,11 @@
           <thead>
             <tr>
               <th>Getränk</th>
-              <th>Verbraucht</th>
+              <th>Preis</th>
+              <th>Anfang</th>
               <th>Endbestand (Rest)</th>
+              <th>Verbraucht</th>
+              <th>Wert (€)</th>
             </tr>
           </thead>
           <tbody id="drinks-calc-body">
@@ -71,20 +74,16 @@
       <h2>📊 Abrechnung</h2>
       <div class="summary-grid">
         <div class="summary-item">
-          <span class="summary-label">Eingekaufte Getränke gesamt</span>
-          <span id="stat-initial-items" class="summary-value">0 Stk.</span>
-        </div>
-        <div class="summary-item">
-          <span class="summary-label">Getrunkene Getränke gesamt</span>
-          <span id="stat-consumed-items" class="summary-value highlight-consumed">0 Stk.</span>
-        </div>
-        <div class="summary-item">
-          <span class="summary-label">Warenwert Gesamt</span>
+          <span class="summary-label">Gesamtwert (Einkauf)</span>
           <span id="stat-total-val" class="summary-value">0,00 €</span>
         </div>
+        <div class="summary-item">
+          <span class="summary-label">Endstand (Restwert)</span>
+          <span id="stat-remaining-val" class="summary-value highlight-remaining">0,00 €</span>
+        </div>
         <div class="summary-item main-result">
-          <span class="summary-label">Gesamteinnahmen</span>
-          <span id="stat-total-revenue" class="summary-value highlight-revenue">0,00 €</span>
+          <span class="summary-label">Verbrauch (Getrunken in €)</span>
+          <span id="stat-consumed-val" class="summary-value highlight-revenue">0,00 €</span>
         </div>
       </div>
     </section>
