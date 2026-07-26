@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const addDrinkBtn = document.getElementById("add-drink-btn");
   const calculateBtn = document.getElementById("calculate-btn");
   const resetBtn = document.getElementById("reset-btn");
+  const exportPdfBtn = document.getElementById("export-pdf-btn");
   const summaryCard = document.getElementById("summary-card");
 
   // Initialisierung: Eine leere Startzeile bereitstellen
@@ -24,7 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
       <td data-label="Aktion"><button class="icon-btn remove-row-btn" title="Entfernen">✕</button></td>
     `;
 
-    // Live-Updates bei jeder Eingabe
     tr.querySelectorAll("input").forEach(input => {
       input.addEventListener("input", syncCalcTable);
     });
@@ -45,7 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const setupRows = drinksSetupBody.querySelectorAll("tr");
     const currentCalcValues = {};
 
-    // Eingegebene Restbestände im Speicher halten
     drinksCalcBody.querySelectorAll("tr").forEach((tr, idx) => {
       const restInput = tr.querySelector(".drink-rest");
       if (restInput) {
@@ -109,11 +108,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const remainingValue = rest * price;
       const initialValue = initial * price;
 
-      // Tabellenzellen in der 2. Tabelle aktualisieren
       calcRow.querySelector(".consumed-val").textContent = `${consumed} Stk.`;
       calcRow.querySelector(".revenue-val").textContent = `${consumedValue.toFixed(2)} €`;
 
-      // Gesamtsummen berechnen
       totalPotentialVal += initialValue;
       totalConsumedVal += consumedValue;
       totalRemainingVal += remainingValue;
@@ -121,13 +118,104 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (hasError) return;
 
-    // Kassensturz/Zusammenfassung befüllen und anzeigen
     document.getElementById("stat-total-val").textContent = `${totalPotentialVal.toFixed(2)} €`;
     document.getElementById("stat-remaining-val").textContent = `${totalRemainingVal.toFixed(2)} €`;
     document.getElementById("stat-consumed-val").textContent = `${totalConsumedVal.toFixed(2)} €`;
 
     summaryCard.classList.remove("hidden");
     summaryCard.scrollIntoView({ behavior: "smooth" });
+  });
+
+  // PDF-Export Funktion
+  exportPdfBtn.addEventListener("click", () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const today = new Date().toLocaleDateString("de-DE");
+
+    // Header / Titel
+    doc.setFontSize(20);
+    doc.setTextColor(30, 41, 59); // Dunkelblau/Grau
+    doc.text("Vereins-Getränkeabrechnung", 14, 20);
+
+    doc.setFontSize(10);
+    doc.setTextColor(100, 116, 139);
+    doc.text(`Erstellt am: ${today}`, 14, 27);
+
+    // Daten aus der Tabelle sammeln
+    const tableData = [];
+    const setupRows = drinksSetupBody.querySelectorAll("tr");
+    const calcRows = drinksCalcBody.querySelectorAll("tr");
+
+    let totalInitial = 0;
+    let totalRest = 0;
+    let totalConsumed = 0;
+
+    setupRows.forEach((setupRow, idx) => {
+      const calcRow = calcRows[idx];
+      const name = setupRow.querySelector(".drink-name").value || `Getränk ${idx + 1}`;
+      const price = parseFloat(setupRow.querySelector(".drink-price").value) || 0;
+      const initial = parseInt(setupRow.querySelector(".drink-initial").value) || 0;
+      const rest = calcRow ? (parseInt(calcRow.querySelector(".drink-rest").value) || 0) : 0;
+      const consumed = initial - rest;
+      const consumedVal = consumed * price;
+
+      totalInitial += initial;
+      totalRest += rest;
+      totalConsumed += consumed;
+
+      tableData.push([
+        name,
+        `${price.toFixed(2)} €`,
+        `${initial} Stk.`,
+        `${rest} Stk.`,
+        `${consumed} Stk.`,
+        `${consumedVal.toFixed(2)} €`
+      ]);
+    });
+
+    // Haupttabelle im PDF zeichnen
+    doc.autoTable({
+      startY: 35,
+      head: [["Getränk", "Einzelpreis", "Anfang", "Restbestand", "Verbraucht", "Verbrauch (€)"]],
+      body: tableData,
+      theme: "striped",
+      headStyles: { fillColor: [30, 41, 59], textColor: [255, 255, 255], fontStyle: "bold" },
+      styles: { fontSize: 9, cellPadding: 3 },
+      columnStyles: {
+        1: { halign: "right" },
+        2: { halign: "right" },
+        3: { halign: "right" },
+        4: { halign: "right" },
+        5: { halign: "right" }
+      }
+    });
+
+    // Kassensturz / Gesamtergebnis unter der Tabelle
+    const finalY = doc.lastAutoTable.finalY + 10;
+
+    const totalPotentialVal = document.getElementById("stat-total-val").textContent;
+    const totalRemainingVal = document.getElementById("stat-remaining-val").textContent;
+    const totalConsumedVal = document.getElementById("stat-consumed-val").textContent;
+
+    doc.autoTable({
+      startY: finalY,
+      head: [["Zusammenfassung / Kassensturz", "Betrag"]],
+      body: [
+        ["Gesamtwert (Einkauf)", totalPotentialVal],
+        ["Endstand (Restwert)", totalRemainingVal],
+        ["Gesamter Verbrauch (Umsatz / Getrunken in €)", totalConsumedVal]
+      ],
+      theme: "plain",
+      headStyles: { fillColor: [51, 65, 85], textColor: [255, 255, 255], fontStyle: "bold" },
+      styles: { fontSize: 10, cellPadding: 3 },
+      columnStyles: {
+        1: { halign: "right", fontStyle: "bold" }
+      }
+    });
+
+    // PDF speichern
+    doc.save(`Getraenkeabrechnung_${today.replace(/\./g, "-")}.pdf`);
   });
 
   // Zurücksetzen
@@ -138,7 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Schutz vor HTML-Injektionen
   function escapeHtml(text) {
     return text.replace(/[&<>"']/g, function(m) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
