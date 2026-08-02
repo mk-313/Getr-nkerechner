@@ -17,7 +17,19 @@
       <h1>🍺 Getränkerechner</h1>
       <p>Abrechnung & Verbrauch</p>
     </header>
-
+    <!-- Projekt-Verwaltung -->
+    <section class="card project-bar">
+      <div class="project-selector-group">
+        <label for="project-select">Aktuelle Veranstaltung:</label>
+        <select id="project-select">
+          <!-- Dynamisch per JS befüllt -->
+        </select>
+      </div>
+      <div class="project-actions">
+        <button id="new-project-btn" class="btn secondary-btn">+ Neue Veranstaltung</button>
+        <button id="delete-project-btn" class="btn danger-btn">Veranstaltung löschen</button>
+      </div>
+    </section>
     <!-- Phase 1: Einkauf & Getränke-Setup -->
     <section class="card">
       <h2>1. Getränke & Einkauf erfassen</h2>
